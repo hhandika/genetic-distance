@@ -1,0 +1,26 @@
+---
+title: "Phylo"
+author: "Heru Handika"
+date: "10/15/2021"
+output: html_document
+---
+
+```{r}
+library(here)
+library(ape)
+library(harrietr)
+library(tidyverse)
+```
+
+```{r}
+data <- read.dna(here("data","cytb.phy"), format="interleaved")
+
+distance <- dist.dna(data, model = "JC69", variance = FALSE, gamma = FALSE, pairwise.deletion = FALSE, base.freq = NULL, as.matrix = FALSE)
+
+matrix <- as.matrix(distance)
+
+melted_distance <- melt_dist(matrix, order = NULL, dist_name = "JC69")
+write.csv(melted_distance, here("results", "JC69-distances-melted.csv"))
+write.csv(matrix, here("results", "JC69-distances-matrix.csv"))
+``` 
+
