@@ -12,6 +12,8 @@ library(harrietr)
 library(tidyverse)
 ```
 
+
+
 ```{r}
 data <- read.dna(here("data","cytb.phy"), format="interleaved")
 
@@ -20,7 +22,16 @@ distance <- dist.dna(data, model = "JC69", variance = FALSE, gamma = FALSE, pair
 matrix <- as.matrix(distance)
 
 melted_distance <- melt_dist(matrix, order = NULL, dist_name = "JC69")
-write.csv(melted_distance, here("results", "JC69-distances-melted.csv"))
+melted_csv <- "JC69-distances-melted.csv"
+write.csv(melted_distance, here("results", melted_csv))
 write.csv(matrix, here("results", "JC69-distances-matrix.csv"))
 ``` 
+
+
+
+```{r}
+result <- read_csv(here("results", melted_csv))
+
+
+```
 
