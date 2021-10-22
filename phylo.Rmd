@@ -32,6 +32,9 @@ write.csv(matrix, here("results", "JC69-distances-matrix.csv"))
 ```{r}
 result <- read_csv(here("results", melted_csv))
 
+split_res <- result %>% separate(iso1, c("Genus1", "Species1", "Museum_no1"), sep="_") %>%
+  separate(iso2, c("Genus2", "Species2", "Museum_no2"), sep="_") %>%
+  unite("Species", Genus1, Species1) %>% unite("Species2", Genus2, Species2)
 
 ```
 
