@@ -11,6 +11,7 @@ library(ape)
 library(harrietr)
 library(tidyverse)
 ```
+
 ## Troubleshooting dependencies
 
 ```{r}
@@ -46,5 +47,6 @@ split_res <- result %>% separate(iso1, c("Genus1", "Species1", "Museum_no"), sep
   separate(iso2, c("Genus2", "Species2", "Museum_no2"), sep="_") %>%
   unite("Species", Genus1, Species1) %>% unite("Species2", Genus2, Species2)
 
+inter_distance <- split_res %>% group_by(Species, Species2) %>% summarise(mean(JC69))
 ```
 
