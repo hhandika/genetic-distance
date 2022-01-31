@@ -13,8 +13,11 @@ and produces more consistent results compare to pivot functions.
 ```{r}
 library(here)
 library(ape)
+library(tidyr)
 library(reshape2)
-library(tidyverse)
+library(tibble)
+library(dplyr)
+# library(tidyverse)
 ```
 
 ## Data loading and genetic distance computing for intra-specific relationship
@@ -25,29 +28,37 @@ data <- read.dna(here("data","cytb.phy"), format="interleaved")
 distance <- dist.dna(data, model = "JC69", variance = FALSE, gamma = FALSE, pairwise.deletion = FALSE, base.freq = NULL, as.matrix = TRUE)
 
 melted_distance <- melt(distance, value.name = "JC69")
+
+melted_dist <- distance |> 
+  as.data.frame() |>
+  tibble::rownames_to_column(var = "Var1") |>
+  tidyr::pivot_longer(!Var1, names_to = "Var2", values_to = "JC69")
 ``` 
 
 ## Computing avarage genetic distance for inter-specific relationship
 
 ```{r}
-cleaned_distance <- melted_distance %>%
-  separate(Var1, c("Genus1", "Species1", "Museum_no"), sep="_") %>%
-  separate(Var2, c("Genus2", "Species2", "Museum_no2"), sep="_") %>%
-  unite("Species", Genus1, Species1) %>%
-  unite("Species2", Genus2, Species2)
+cleaned_distance <- melted_distance |>
+  tidyr::separate(Var1, c("Genus1", "Species1", "Museum_no"), sep="_") |>
+  tidyr::separate(Var2, c("Genus2", "Species2", "Museum_no2"), sep="_") |>
+  tidyr::unite("Species", Genus1, Species1) |>
+  tidyr::unite("Species2", Genus2, Species2)
 
 # Generate inter specific relationship
-inter_distance <- cleaned_distance %>% 
-  group_by(Species, Species2) %>% 
-  summarise(Distance = mean(JC69)) %>%
-  filter(Species != Species2) # ignore intra-specific relationship
+inter_distance <- cleaned_distance |> 
+  dplyr::group_by(Species, Species2) |> 
+  dplyr::summarise(Distance = mean(JC69)) |>
+  dplyr::filter(Species != Species2) # ignore intra-specific relationship
 
 # Convert the result back to a matrix
-inter_dist_matrix <- inter_distance %>% 
-  dcast(Species ~ Species2, value.var = "Distance")
+inter_dist_matrix <- inter_distance |> 
+  reshape2::dcast(Species ~ Species2, value.var = "Distance")
+
+inter_dist_mat <- inter_distance |>
+  tidyr::pivot_wider(names_from = Species2, values_from = Distance)
 
 # Remove duplicate values in the upper triangle of the matrix
-inter_dist_matrix[upper.tri(inter_dist_matrix)] <- NA
+inter_dist_mat[upper.tri(inter_dist_matrix)] <- NA
 
 write.csv(inter_dist_matrix, here("results", "inter-specific-dist-matrix.csv"), na="")
 ```
