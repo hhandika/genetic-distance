@@ -5,16 +5,13 @@ date: "10/15/2021"
 output: html_document
 ---
 
-Here, I use reshape2 to change the table format from long to wide formats and vice-versa.
-Development wise, reshape2 has been superseded by pivot_wider and pivot_longer functions in the tidyr library.
-But, I found reshape2 works well with matrix table that ape generated 
-and produces more consistent results compare to pivot functions.
+
 
 ```{r}
 library(here)
 library(ape)
 library(tidyr)
-library(reshape2)
+# library(reshape2)
 library(tibble)
 library(dplyr)
 # library(tidyverse)
